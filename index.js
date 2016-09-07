@@ -12,11 +12,11 @@ const middlewareWrapper = (config) => {
     fs.readFileSync(path.join(__dirname, '/index.html'))
       .toString()
       .replace(/{{title}}/g, config.title)
-      .replace(/{{script}}/g, fs.readFileSync(path.join(__dirname, '/app.js')))
+      .replace(/{{script}}/g, fs.readFileSync(path.join(__dirname, '/app.js'))) // inline contents
       .replace(/{{style}}/g, fs.readFileSync(path.join(__dirname, '/style.css')));
 
   return (req, res, next) => {
-    socketIoInit(req.socket.server, config.spans);
+    socketIoInit(req.socket.server, config.spans);// only initiate once
 
     const startTime = process.hrtime();
     if (req.path === config.path) {

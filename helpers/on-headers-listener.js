@@ -9,7 +9,7 @@ module.exports = (statusCode, startTime, spans) => {
       last[category]++;
       last.count++;
       last.mean = last.mean + ((responseTime - last.mean) / last.count);
-    } else {
+    } else { // brand new 
       span.responses.push({
         2: category === 2 ? 1 : 0,
         3: category === 3 ? 1 : 0,

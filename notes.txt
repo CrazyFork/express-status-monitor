@@ -1,0 +1,137 @@
+## project feature
+
+  using socketio
+
+
+
+## project's code notes
+
+  models:
+    spans: Array[span] // length 3, 1 min, 5min, 15min, defined in the helpers/default-config.js
+    span:
+      os: Array[?], // todo:
+      interval: Int, // minutes
+      retention: Int, //
+      responses:Array[_]
+        2: Int, // response category, eg: 2xx
+        3: Int, // response category
+        4: Int, // response category
+        5: Int, // response category
+        count: Int, // total responses
+        mean: Int, // caused time, in secs
+        timestamp: Date.now(), // timestamp of this response created
+
+      represent infos accumulated in a certain span of time
+
+    defaultConfig:
+
+      title: 'Express Status',
+      path: '/status', // monitor path
+      spans: [ // each time span
+        {
+          interval: 1,
+          retention: 60,
+        },
+        {
+          interval: 5,
+          retention: 60,
+        },
+        {
+          interval: 15,
+          retention: 60,
+        },
+      ],
+
+  Files:
+
+    helpers/
+
+      gather-os-mertrics.js: (io, span)=>Unit
+        gather system info, send to socketio
+
+      send-mertrics.js: (io, span)=>Unit
+        do the actual sending work
+
+      on-headers=listener.js: (statusCode:Int, startTime: Int, spans: Array[span])=>Unit
+        update existing span / create new one based on new incoming statusCode
+
+
+      socket-io-init: (http.Server, spans: Array[span])=>Unit
+        hood up socketio & add calc metrics timer
+
+
+      validate.js: (config)=>config
+        clean config then return it
+
+      default-config.js: config
+        default configuration
+
+    app.js:
+
+    index.js:
+
+
+
+
+## how things works/ get mesured
+
+    
+cpu:
+  os.loadavg()
+
+memory:
+  pidusage.stat
+
+socketio:
+
+
+
+
+## Notes
+
+process.hrtime:
+
+  used to mesure performance, calc how much time elipsed
+
+    var time = process.hrtime();
+    // [ 1800216, 25 ]
+
+    setTimeout(() => {
+      var diff = process.hrtime(time);
+      // [ 1, 552 ]
+
+    console.log(`Benchmark took ${diff[0] * 1e9 + diff[1]} nanoseconds`);
+      // benchmark took 1000000527 nanoseconds
+    }, 1000);
+
+
+timer.unref:
+  
+  unref will make this timer prevent nodejs from exiting after no work to be scheduled:
+
+    const interval = setInterval(() => gatherOsMetrics(io, span), span.interval * 1000);
+    interval.unref(); // don't keep node.js process up
+
+
+
+
+dependencies:
+
+  dependencies:
+
+    "on-headers": "^1.0.1", // Execute a listener when a response is about to write headers. 
+    "pidusage": "^1.0.4",   // calc cpu usage
+    "socket.io": "^1.4.8"
+
+
+todo:
+  
+
+  done:
+
+
+  pending:
+
+    finish todos in this doc
+    finish `how things work section`
+
