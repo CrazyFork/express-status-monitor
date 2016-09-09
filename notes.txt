@@ -8,8 +8,14 @@
 
   models:
     spans: Array[span] // length 3, 1 min, 5min, 15min, defined in the helpers/default-config.js
+
+
     span:
-      os: Array[?], // todo:
+      os: Array[Object], // todo:
+        obj:
+          memory: Number, // memory in mb
+          load: Array[Number], // result of `os.loadavg`
+          timestamp: Number, // result of Date.now()
       interval: Int, // minutes
       retention: Int, //
       responses:Array[_]
@@ -84,6 +90,26 @@ memory:
 
 socketio:
 
+    // hoodup to http.Server
+    // socket-io-init.js
+    io = socketIo(server);
+
+    io.on('connection', (socket) => {
+      socket.emit('start', spans);
+      socket.on('change', () => {
+        socket.emit('start', spans);
+      });
+    });
+
+    // sending data
+    // send-metrics.js
+    io.emit('stats', {
+      os: span.os[span.os.length - 2],
+      responses: span.responses[span.responses.length - 2],
+      interval: span.interval,
+      retention: span.retention,
+    });
+
 
 
 
@@ -125,13 +151,7 @@ dependencies:
 
 
 todo:
-  
-
   done:
-
-
   pending:
-
-    finish todos in this doc
     finish `how things work section`
 
